@@ -1,0 +1,86 @@
+# Cloud Build pipeline - App B (Node.js / Express)
+# Pipeline order:
+#   1. Install dependencies
+#   2. BVT smoke test  (gate)
+#   3. Full TDD suite  (FAILS on intentional failure test - demonstrates CI interception)
+#   4. Selenium UI tests (headless Chrome)
+#   5. Docker build + push to Artifact Registry
+#   6. Deploy to Cloud Run
+#
+# Substitution variables (override in Cloud Build trigger):
+#   _REGION : GCP region  (default: australia-southeast1)
+#   _REPO   : Artifact Registry repo name  (default: sit707-repo)
+
+steps:
+  # ---- Step 1: Install all dependencies (including devDependencies) ----
+  - name: 'node:18'
+    id: 'install-deps'
+    entrypoint: 'npm'
+    args: ['ci']
+
+  # ---- Step 2: BVT (Build Verification / Smoke Test) -------------------
+  - name: 'node:18'
+    id: 'bvt-smoke-test'
+    entrypoint: 'npm'
+    args: ['run', 'test:bvt']
+
+  # ---- Step 3: Full TDD suite ------------------------------------------
+  # NOTE: This step is intentionally expected to report 1 failure
+  #       (INTENTIONAL FAIL: 1 meter equals 100 feet) to demonstrate CI interception.
+  - name: 'node:18'
+    id: 'tdd-full-suite'
+    entrypoint: 'npm'
+    args: ['run', 'test:full']
+
+  # ---- Step 4: Selenium UI tests (headless Chrome) ----------------------
+  - name: 'node:18'
+    id: 'selenium-ui-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update -y -q
+        wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        apt-get install -y ./google-chrome-stable_current_amd64.deb
+        npm run test:selenium
+
+  # ---- Step 5: Build Docker image --------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-build'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-nodejs:${SHORT_SHA}'
+      - '.'
+
+  # ---- Step 6: Push image to Artifact Registry -------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-push'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-nodejs:${SHORT_SHA}'
+
+  # ---- Step 7: Deploy to Cloud Run -------------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'cloud-run-deploy'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'unit-converter-nodejs'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-nodejs:${SHORT_SHA}'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '3000'
+
+substitutions:
+  _REGION: australia-southeast1
+  _REPO: sit707-repo
+
+options:
+  logging: CLOUD_LOGGING_ONLY

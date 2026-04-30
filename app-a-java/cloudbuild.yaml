@@ -1,0 +1,90 @@
+# Cloud Build pipeline - App A (Java / Spring Boot)
+# Pipeline order:
+#   1. BVT smoke test  (gate)
+#   2. Full TDD suite  (FAILS on intentionalFail_1MeterEquals100Feet - demonstrates CI interception)
+#   3. Selenium UI tests (headless Chrome)
+#   4. Docker build + push to Artifact Registry
+#   5. Deploy to Cloud Run
+#
+# Substitution variables (override in Cloud Build trigger):
+#   _REGION : GCP region  (default: australia-southeast1)
+#   _REPO   : Artifact Registry repo name  (default: sit707-repo)
+
+steps:
+  # ---- Step 1: BVT (Build Verification / Smoke Test) -------------------
+  - name: 'maven:3.8.4-openjdk-11'
+    id: 'bvt-smoke-test'
+    entrypoint: 'mvn'
+    args:
+      - 'test'
+      - '-Dtest=UnitConverterBVTTest'
+      - '-DfailIfNoTests=false'
+      - '-B'
+
+  # ---- Step 2: Full TDD suite ------------------------------------------
+  # NOTE: This step is intentionally expected to report 1 failure
+  #       (intentionalFail_1MeterEquals100Feet) to demonstrate CI interception.
+  - name: 'maven:3.8.4-openjdk-11'
+    id: 'tdd-full-suite'
+    entrypoint: 'mvn'
+    args:
+      - 'test'
+      - '-Dtest=UnitConverterTest'
+      - '-DfailIfNoTests=false'
+      - '-B'
+
+  # ---- Step 3: Selenium UI tests (headless Chrome) ----------------------
+  - name: 'maven:3.8.4-openjdk-11'
+    id: 'selenium-ui-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        apt-get update -y -q
+        wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+        apt-get install -y ./google-chrome-stable_current_amd64.deb
+        mvn package -DskipTests -B -q
+        java -jar target/unit-converter-0.0.1-SNAPSHOT.jar &
+        sleep 20
+        mvn test -Dtest=ConverterSeleniumTest -DfailIfNoTests=false -B
+
+  # ---- Step 4: Build Docker image --------------------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-build'
+    args:
+      - 'build'
+      - '-t'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-java:${SHORT_SHA}'
+      - '.'
+
+  # ---- Step 5: Push image to Artifact Registry -------------------------
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'docker-push'
+    args:
+      - 'push'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-java:${SHORT_SHA}'
+
+  # ---- Step 6: Deploy to Cloud Run -------------------------------------
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'cloud-run-deploy'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'unit-converter-java'
+      - '--image'
+      - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-java:${SHORT_SHA}'
+      - '--region'
+      - '${_REGION}'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+
+substitutions:
+  _REGION: australia-southeast1
+  _REPO: sit707-repo
+
+options:
+  logging: CLOUD_LOGGING_ONLY

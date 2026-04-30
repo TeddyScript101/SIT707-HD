@@ -1,0 +1,24 @@
+{
+  "name": "unit-converter-nodejs",
+  "version": "1.0.0",
+  "description": "SIT707 7.2HD - Unit Converter Node.js (Meters to Feet)",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test:bvt": "jest --testPathPattern=bvt --forceExit",
+    "test:full": "jest --testPathPattern=converter\\.test --forceExit",
+    "test:selenium": "jest --testPathPattern=selenium --forceExit",
+    "test": "jest --forceExit"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "jest": "^29.5.0",
+    "selenium-webdriver": "^4.10.0"
+  },
+  "jest": {
+    "testTimeout": 30000,
+    "testEnvironment": "node"
+  }
+}
