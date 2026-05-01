@@ -44,12 +44,31 @@ steps:
       - '-c'
       - |
         apt-get update -y -q
+        apt-get install -y -q unzip curl
+
+        # Install Chrome
         wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
         apt-get install -y ./google-chrome-stable_current_amd64.deb
+
+        # Download the matching ChromeDriver from Chrome for Testing
+        # (Selenium Manager cannot run inside Cloud Build sandbox)
+        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
+        echo "Detected Chrome: $CHROME_VERSION"
+        wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"
+        unzip -q chromedriver-linux64.zip
+        mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
+        chmod +x /usr/local/bin/chromedriver
+        echo "ChromeDriver: $(chromedriver --version)"
+
+        # Build and start the Spring Boot app
         mvn package -DskipTests -B -q
         java -jar target/unit-converter-0.0.1-SNAPSHOT.jar &
         sleep 20
-        mvn test -Dtest=ConverterSeleniumTest -DfailIfNoTests=false -B
+
+        # Run Selenium tests - pass ChromeDriver path via system property
+        mvn test -Dtest=ConverterSeleniumTest \
+          -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver \
+          -DfailIfNoTests=false -B
 
   # ---- Step 4: Build Docker image --------------------------------------
   - name: 'gcr.io/cloud-builders/docker'
