@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Unit Converter - SIT707</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 0 20px; background: #f5f5f5; }
+        body { font-family: Arial, sans-serif; max-width: 620px; margin: 50px auto; padding: 0 20px; background: #f5f5f5; }
         .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h1 { color: #333; margin-bottom: 5px; }
-        p.meta { color: #888; font-size: 0.85em; margin-top: 0; }
+        p.meta { color: #888; font-size: .85em; margin-top: 0; }
         .form-group { margin-bottom: 16px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
         input, select { width: 100%; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
@@ -20,14 +20,28 @@
 <body>
 <div class="card">
     <h1>Unit Converter</h1>
-    <p class="meta">Student ID: 223983938 | SIT707 Task 7.2H (App A - Java)</p>
+    <p class="meta">Student ID: 223983938 | SIT707 Task 7.2H (App A - Java / Refactor Stage)</p>
 
     <form action="/convert" method="post">
         <div class="form-group">
-            <label for="direction">Conversion Direction</label>
+            <label for="direction">Conversion</label>
             <select id="direction" name="direction">
-                <option value="mToF">Meters → Feet</option>
-                <option value="fToM">Feet → Meters</option>
+                <optgroup label="Length">
+                    <option value="mToF">Meters &rarr; Feet</option>
+                    <option value="fToM">Feet &rarr; Meters</option>
+                    <option value="kmToMi">Kilometers &rarr; Miles</option>
+                    <option value="miToKm">Miles &rarr; Kilometers</option>
+                    <option value="cmToIn">Centimeters &rarr; Inches</option>
+                    <option value="inToCm">Inches &rarr; Centimeters</option>
+                </optgroup>
+                <optgroup label="Weight">
+                    <option value="kgToLb">Kilograms &rarr; Pounds</option>
+                    <option value="lbToKg">Pounds &rarr; Kilograms</option>
+                </optgroup>
+                <optgroup label="Temperature">
+                    <option value="cToF">Celsius &rarr; Fahrenheit</option>
+                    <option value="fToC">Fahrenheit &rarr; Celsius</option>
+                </optgroup>
             </select>
         </div>
         <div class="form-group">

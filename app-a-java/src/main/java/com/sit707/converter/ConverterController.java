@@ -26,17 +26,46 @@ public class ConverterController {
         try {
             double input = Double.parseDouble(value);
             double result;
+            String fromUnit, toUnit;
 
-            if ("mToF".equals(direction)) {
-                result = UnitConverter.metersToFeet(input);
-                model.addAttribute("fromUnit", "meters");
-                model.addAttribute("toUnit", "feet");
-            } else {
-                result = UnitConverter.feetToMeters(input);
-                model.addAttribute("fromUnit", "feet");
-                model.addAttribute("toUnit", "meters");
+            switch (direction) {
+                case "mToF":
+                    result = UnitConverter.metersToFeet(input);
+                    fromUnit = "meters"; toUnit = "feet"; break;
+                case "fToM":
+                    result = UnitConverter.feetToMeters(input);
+                    fromUnit = "feet"; toUnit = "meters"; break;
+                case "kmToMi":
+                    result = UnitConverter.kmToMiles(input);
+                    fromUnit = "kilometers"; toUnit = "miles"; break;
+                case "miToKm":
+                    result = UnitConverter.milesToKm(input);
+                    fromUnit = "miles"; toUnit = "kilometers"; break;
+                case "cmToIn":
+                    result = UnitConverter.cmToInches(input);
+                    fromUnit = "centimeters"; toUnit = "inches"; break;
+                case "inToCm":
+                    result = UnitConverter.inchesToCm(input);
+                    fromUnit = "inches"; toUnit = "centimeters"; break;
+                case "kgToLb":
+                    result = UnitConverter.kgToPounds(input);
+                    fromUnit = "kilograms"; toUnit = "pounds"; break;
+                case "lbToKg":
+                    result = UnitConverter.poundsToKg(input);
+                    fromUnit = "pounds"; toUnit = "kilograms"; break;
+                case "cToF":
+                    result = UnitConverter.celsiusToFahrenheit(input);
+                    fromUnit = "°C"; toUnit = "°F"; break;
+                case "fToC":
+                    result = UnitConverter.fahrenheitToCelsius(input);
+                    fromUnit = "°F"; toUnit = "°C"; break;
+                default:
+                    model.addAttribute("error", "Unknown conversion type.");
+                    return "index";
             }
 
+            model.addAttribute("fromUnit", fromUnit);
+            model.addAttribute("toUnit", toUnit);
             model.addAttribute("result", String.format("%.5f", result));
 
         } catch (NumberFormatException e) {
