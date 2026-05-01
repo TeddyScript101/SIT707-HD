@@ -8,7 +8,7 @@ package com.sit707.converter;
  * After swapping, all tests pass EXCEPT intentionalFail_1MeterEquals100Feet,
  * which remains to demonstrate how the CI pipeline intercepts failures.
  */
-public class UnitConverterGreen {
+public class UnitConverter {
 
     private static final double METERS_TO_FEET = 3.28084;
     private static final double FEET_TO_METERS = 0.3048;
