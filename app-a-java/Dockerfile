@@ -7,7 +7,7 @@ COPY src ./src
 RUN mvn package -DskipTests -B
 
 # Stage 2 - minimal runtime image
-FROM openjdk:11-jre-slim
+FROM eclipse-temurin:11-jre-focal
 WORKDIR /app
 COPY --from=build /app/target/unit-converter-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
