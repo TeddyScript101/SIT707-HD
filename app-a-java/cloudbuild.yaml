@@ -14,6 +14,7 @@ steps:
   # ---- Step 1: BVT (Build Verification / Smoke Test) -------------------
   - name: 'maven:3.8.4-openjdk-11'
     id: 'bvt-smoke-test'
+    dir: 'app-a-java'
     entrypoint: 'mvn'
     args:
       - 'test'
@@ -26,6 +27,7 @@ steps:
   #       (intentionalFail_1MeterEquals100Feet) to demonstrate CI interception.
   - name: 'maven:3.8.4-openjdk-11'
     id: 'tdd-full-suite'
+    dir: 'app-a-java'
     entrypoint: 'mvn'
     args:
       - 'test'
@@ -36,6 +38,7 @@ steps:
   # ---- Step 3: Selenium UI tests (headless Chrome) ----------------------
   - name: 'maven:3.8.4-openjdk-11'
     id: 'selenium-ui-tests'
+    dir: 'app-a-java'
     entrypoint: 'bash'
     args:
       - '-c'
@@ -51,6 +54,7 @@ steps:
   # ---- Step 4: Build Docker image --------------------------------------
   - name: 'gcr.io/cloud-builders/docker'
     id: 'docker-build'
+    dir: 'app-a-java'
     args:
       - 'build'
       - '-t'
@@ -60,6 +64,7 @@ steps:
   # ---- Step 5: Push image to Artifact Registry -------------------------
   - name: 'gcr.io/cloud-builders/docker'
     id: 'docker-push'
+    dir: 'app-a-java'
     args:
       - 'push'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-java:${SHORT_SHA}'
@@ -67,6 +72,7 @@ steps:
   # ---- Step 6: Deploy to Cloud Run -------------------------------------
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'cloud-run-deploy'
+    dir: 'app-a-java'
     entrypoint: 'gcloud'
     args:
       - 'run'

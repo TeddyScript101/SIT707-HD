@@ -15,12 +15,14 @@ steps:
   # ---- Step 1: Install all dependencies (including devDependencies) ----
   - name: 'node:18'
     id: 'install-deps'
+    dir: 'app-b-nodejs'
     entrypoint: 'npm'
-    args: ['ci']
+    args: ['install']
 
   # ---- Step 2: BVT (Build Verification / Smoke Test) -------------------
   - name: 'node:18'
     id: 'bvt-smoke-test'
+    dir: 'app-b-nodejs'
     entrypoint: 'npm'
     args: ['run', 'test:bvt']
 
@@ -29,12 +31,14 @@ steps:
   #       (INTENTIONAL FAIL: 1 meter equals 100 feet) to demonstrate CI interception.
   - name: 'node:18'
     id: 'tdd-full-suite'
+    dir: 'app-b-nodejs'
     entrypoint: 'npm'
     args: ['run', 'test:full']
 
   # ---- Step 4: Selenium UI tests (headless Chrome) ----------------------
   - name: 'node:18'
     id: 'selenium-ui-tests'
+    dir: 'app-b-nodejs'
     entrypoint: 'bash'
     args:
       - '-c'
@@ -47,6 +51,7 @@ steps:
   # ---- Step 5: Build Docker image --------------------------------------
   - name: 'gcr.io/cloud-builders/docker'
     id: 'docker-build'
+    dir: 'app-b-nodejs'
     args:
       - 'build'
       - '-t'
@@ -56,6 +61,7 @@ steps:
   # ---- Step 6: Push image to Artifact Registry -------------------------
   - name: 'gcr.io/cloud-builders/docker'
     id: 'docker-push'
+    dir: 'app-b-nodejs'
     args:
       - 'push'
       - '${_REGION}-docker.pkg.dev/${PROJECT_ID}/${_REPO}/unit-converter-nodejs:${SHORT_SHA}'
@@ -63,6 +69,7 @@ steps:
   # ---- Step 7: Deploy to Cloud Run -------------------------------------
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'cloud-run-deploy'
+    dir: 'app-b-nodejs'
     entrypoint: 'gcloud'
     args:
       - 'run'
