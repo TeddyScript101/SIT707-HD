@@ -51,18 +51,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Selenium WebDriver -->
+        <!-- Selenium 4 - includes built-in Selenium Manager which auto-downloads
+             the correct ChromeDriver for whatever Chrome version is installed.
+             Replaces the old WebDriverManager + selenium 3.141.59 combo that
+             broke when Chrome 115+ moved ChromeDriver to a new download URL. -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
-            <version>3.141.59</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- WebDriverManager auto-downloads ChromeDriver binary -->
-        <dependency>
-            <groupId>io.github.bonigarcia</groupId>
-            <artifactId>webdrivermanager</artifactId>
-            <version>5.3.3</version>
+            <version>4.18.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

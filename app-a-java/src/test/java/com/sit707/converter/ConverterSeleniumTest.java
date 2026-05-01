@@ -1,6 +1,5 @@
 package com.sit707.converter;
 
-import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,7 +33,7 @@ public class ConverterSeleniumTest {
 
     @Before
     public void setUp() {
-        WebDriverManager.chromedriver().setup();
+        // Selenium 4 Selenium Manager auto-downloads the correct ChromeDriver
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         options.addArguments("--no-sandbox");
