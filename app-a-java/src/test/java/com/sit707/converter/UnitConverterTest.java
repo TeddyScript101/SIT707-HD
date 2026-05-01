@@ -163,16 +163,4 @@ public class UnitConverterTest {
         assertTrue(UnitConverter.feetToMeters(3.5) > 0);
     }
 
-    // ------------------------------------------------------------------
-    // INTENTIONAL FAILURE - kept failing to demonstrate CI interception
-    // Correct value: 1 m = 3.28084 ft, NOT 100 ft.
-    // ------------------------------------------------------------------
-
-    @Test
-    public void intentionalFail_1MeterEquals100Feet() {
-        // This assertion is deliberately wrong: used to show the CI pipeline
-        // catches failing tests even after the Green stage is implemented.
-        assertEquals("INTENTIONAL: 1 m should equal 100 ft (wrong, CI demo)",
-                100.0, UnitConverter.metersToFeet(1.0), DELTA);
-    }
 }

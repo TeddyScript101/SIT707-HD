@@ -141,14 +141,3 @@ describe('EQUIVALENCE CLASSES - Valid partition', () => {
   });
 });
 
-// -----------------------------------------------------------------------
-// INTENTIONAL FAILURE - kept failing to demonstrate CI interception
-// 1 m = 3.28084 ft, NOT 100 ft
-// -----------------------------------------------------------------------
-describe('INTENTIONAL FAILURE - CI pipeline error interception demo', () => {
-  test('INTENTIONAL FAIL: 1 meter equals 100 feet (wrong assertion, CI demo)', () => {
-    // This assertion is deliberately wrong. After Green stage, metersToFeet(1)
-    // returns 3.28084, not 100 - CI pipeline should intercept this failure.
-    expect(metersToFeet(1)).toBeCloseTo(100, 4);
-  });
-});
