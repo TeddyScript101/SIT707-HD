@@ -52,9 +52,9 @@ steps:
 
         # Download the matching ChromeDriver from Chrome for Testing
         # (Selenium Manager cannot run inside Cloud Build sandbox)
-        CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
-        echo "Detected Chrome: $CHROME_VERSION"
-        wget -q "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip"
+        CHROME_VERSION=$$(google-chrome --version | grep -oP '\d+\.\d+\.\d+\.\d+')
+        echo "Detected Chrome: $$CHROME_VERSION"
+        wget -q "https://storage.googleapis.com/chrome-for-testing-public/$$CHROME_VERSION/linux64/chromedriver-linux64.zip"
         unzip -q chromedriver-linux64.zip
         mv chromedriver-linux64/chromedriver /usr/local/bin/chromedriver
         chmod +x /usr/local/bin/chromedriver
