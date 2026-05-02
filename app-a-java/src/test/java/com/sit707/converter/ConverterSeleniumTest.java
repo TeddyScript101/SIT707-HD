@@ -57,7 +57,12 @@ public class ConverterSeleniumTest {
     }
 
     private String bodyText() {
-        return driver.findElement(By.tagName("body")).getText();
+        try {
+            return driver.findElement(By.tagName("body")).getText();
+        } catch (org.openqa.selenium.NoSuchElementException | org.openqa.selenium.StaleElementReferenceException e) {
+            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+            return driver.findElement(By.tagName("body")).getText();
+        }
     }
 
     // ---- Page load -------------------------------------------------------
