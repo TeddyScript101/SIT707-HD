@@ -5,3 +5,7 @@ node_modules/
 *.log
 .env
 report/
+.settings
+.classpath
+.project
+app-b-nodejs/coverage/
